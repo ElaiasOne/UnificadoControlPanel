@@ -5,6 +5,7 @@
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
 import Toolbar from 'primevue/toolbar';
+import logoSrc from '../../assets/tecnolar-logo.svg';
 
 defineProps<{
   usuarioNombre: string;
@@ -23,7 +24,10 @@ const emit = defineEmits<{
   <Toolbar class="main-toolbar">
     <template #start>
       <div class="toolbar-copy">
-        <h2>Tecnolar Unificado</h2>
+        <div class="brand-title">
+          <img class="brand-logo" :src="logoSrc" alt="Logo de Tecnolar Unificado" />
+          <h2>Tecnolar Unificado</h2>
+        </div>
         <p>Consulta cuantos dias tienen registradas ventas los clientes</p>
       </div>
     </template>
@@ -55,6 +59,19 @@ const emit = defineEmits<{
 /* Estilos locales para distribuir texto y acciones */
 .toolbar-copy h2 {
   margin: 0;
+}
+
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(11, 93, 138, 0.24);
 }
 
 .toolbar-copy p {

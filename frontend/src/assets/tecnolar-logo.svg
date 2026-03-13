@@ -1,0 +1,25 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">Logo Tecnolar Unificado</title>
+  <desc id="logoDesc">Simbolo con grafico ascendente y letra T para control comercial</desc>
+  <defs>
+    <linearGradient id="bgGrad" x1="16" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0EA472"/>
+      <stop offset="1" stop-color="#0B5D8A"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="34" y1="35" x2="98" y2="95" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#CDEBFF"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="12" y="12" width="104" height="104" rx="26" fill="url(#bgGrad)"/>
+
+  <path d="M35 38H93V50H72V92H56V50H35V38Z" fill="url(#barGrad)"/>
+
+  <rect x="30" y="84" width="12" height="14" rx="3" fill="#8BD1FF"/>
+  <rect x="47" y="76" width="12" height="22" rx="3" fill="#A4DCFF"/>
+  <rect x="64" y="66" width="12" height="32" rx="3" fill="#BFE6FF"/>
+  <rect x="81" y="54" width="12" height="44" rx="3" fill="#D5EEFF"/>
+
+  <path d="M30 101H98" stroke="#EAF7FF" stroke-width="4" stroke-linecap="round"/>
+</svg>

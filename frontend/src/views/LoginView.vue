@@ -53,7 +53,7 @@ async function comprobarBackend() {
     const estado = await verificarEstadoBackend();
     estadoBackend.value = estado.ok ? 'online' : 'offline';
     estadoTexto.value = estado.ok
-      ? `Conexion activa (${estado.servicio})`
+      ? `Conexion activa`
       : 'Backend respondio con estado no valido';
   } catch (_error) {
     estadoBackend.value = 'offline';

@@ -1,0 +1,34 @@
+/* Fuente principal usada por toda la app */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
+
+/* Variables y ajustes globales de renderizado tipografico */
+:root {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Box model consistente en todos los componentes */
+* {
+  box-sizing: border-box;
+}
+
+/* Altura minima para que pantallas ocupen todo el viewport */
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+/* Fondo general del sistema */
+body {
+  min-width: 320px;
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at 14% 10%, rgba(12, 196, 153, 0.2), transparent 30%),
+    radial-gradient(circle at 80% 15%, rgba(246, 167, 44, 0.16), transparent 32%),
+    linear-gradient(165deg, #f7fbf8, #edf6f2 40%, #fefcf6);
+}

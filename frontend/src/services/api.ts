@@ -31,13 +31,25 @@ export interface Venta {
   Dias?: number;
 }
 
+export interface Cliente {
+  ClienteWeb: number;
+  Sucursal: number;
+  Descripcion: string;
+  Direccion: string;
+  Localidad: number;
+  Rubro: string;
+  Habilitado: boolean;
+}
+
+export type ClientePayload = Cliente;
+
 export interface FiltrosVentas {
   desde?: string;
   hasta?: string;
 }
 
 // URL base de API, configurable por entorno.
-const API_BASE = (import.meta.env.VITE_API_URL || 'https://unificadocontrolpanel-backend-api.onrender.com/').replace(/\/$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 // Helper generico para:
 // - ejecutar fetch
@@ -111,4 +123,48 @@ export function obtenerVentas(token: string, filtros: FiltrosVentas = {}) {
   return requestJson<Venta[]>(endpoint, {
     headers: authHeaders(token),
   });
+}
+
+// ABM de clientes.
+export function obtenerClientes(token: string) {
+  return requestJson<Cliente[]>(`${API_BASE}/clientes`, {
+    headers: authHeaders(token),
+  });
+}
+
+export function crearCliente(token: string, payload: ClientePayload) {
+  return requestJson<Cliente>(`${API_BASE}/clientes`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders(token),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function actualizarCliente(
+  token: string,
+  clienteWeb: number,
+  sucursal: number,
+  payload: ClientePayload,
+) {
+  return requestJson<Cliente>(`${API_BASE}/clientes/${clienteWeb}/${sucursal}`, {
+    method: 'PUT',
+    headers: {
+      ...authHeaders(token),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function bajaCliente(token: string, clienteWeb: number, sucursal: number) {
+  return requestJson<{ ClienteWeb: number; Sucursal: number; Habilitado: boolean }>(
+    `${API_BASE}/clientes/${clienteWeb}/${sucursal}/baja`,
+    {
+      method: 'PATCH',
+      headers: authHeaders(token),
+    },
+  );
 }

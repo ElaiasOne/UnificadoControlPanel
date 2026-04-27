@@ -15,6 +15,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: 'recargar'): void;
+  (e: 'abrirClientes'): void;
   (e: 'cerrarSesion'): void;
 }>();
 </script>
@@ -42,6 +43,12 @@ const emit = defineEmits<{
           severity="secondary"
           :loading="cargando"
           @click="emit('recargar')"
+        />
+        <Button
+          label="Clientes"
+          icon="pi pi-users"
+          outlined
+          @click="emit('abrirClientes')"
         />
         <Button
           label="Cerrar sesion"

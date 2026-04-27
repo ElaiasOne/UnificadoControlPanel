@@ -97,6 +97,10 @@ async function cerrarSesion() {
   await router.push('/login');
 }
 
+async function irAClientes() {
+  await router.push('/clientes');
+}
+
 // Carga coordinada de perfil + ventas.
 async function cargarDatos() {
   const token = obtenerToken();
@@ -166,6 +170,7 @@ onMounted(() => {
       :usuario-rol="usuarioRol"
       :cargando="cargando"
       @recargar="cargarDatos"
+      @abrir-clientes="irAClientes"
       @cerrar-sesion="cerrarSesion"
     />
 

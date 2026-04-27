@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { TOKEN_KEY } from '../constants/session';
+import ClientesAbmView from '../views/ClientesAbmView.vue';
 import DashboardView from '../views/DashboardView.vue';
 import LoginView from '../views/LoginView.vue';
 
@@ -22,6 +23,12 @@ const router = createRouter({
       name: 'dashboard',
       component: DashboardView,
       // Marca de ruta protegida para el guard global.
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/clientes',
+      name: 'clientes',
+      component: ClientesAbmView,
       meta: { requiresAuth: true },
     },
     {

@@ -15,8 +15,8 @@ function parsePort(value, fallback) {
 
 // Configuracion de conexion a la base de datos SQL Server
 const configDB = {
-    user: process.env.DB_USER || 'SHS',
-    password: process.env.DB_PASSWORD || '',
+    user: process.env.DB_USER || 'SA',
+    password: process.env.DB_PASSWORD || 'LaCrujia_3261',
     server: process.env.DB_SERVER || '72.62.137.165',
     database: process.env.DB_NAME || 'TecnolarUnificado',
     port: parsePort(process.env.DB_PORT, 1433),

@@ -49,7 +49,7 @@ export interface FiltrosVentas {
 }
 
 // URL base de API, configurable por entorno.
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 // Helper generico para:
 // - ejecutar fetch

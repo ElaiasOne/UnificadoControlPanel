@@ -1,7 +1,8 @@
+require('dotenv').config();
 const app = require('./src/app');
 const { validarConexion } = require('./src/db/connection');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 async function iniciarServidor() {
     try {

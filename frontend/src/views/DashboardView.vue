@@ -18,8 +18,35 @@ const usuario = ref<Usuario | null>(null);
 const ventas = ref<Venta[]>([]);
 const filtro = ref('');
 const ultimaActualizacion = ref('-');
-const fechaHasta = ref<Date | null>(new Date());
-const fechaDesde = ref<Date | null>(new Date(Date.now() - 1000 * 60 * 60 * 24 * 30));
+// Calcula la ultima semana completa de sabado a viernes.
+function obtenerUltimaSemanaSabadoAViernes() {
+  const hoy = new Date();
+  const diaSemana = hoy.getDay();
+  // Domingo (0) -> restar 2
+  // Lunes (1) -> restar 3
+  // Martes (2) -> restar 4
+  // Miercoles (3) -> restar 5
+  // Jueves (4) -> restar 6
+  // Viernes (5) -> restar 7
+  // Sabado (6) -> restar 1
+  const diasParaViernes = [2, 3, 4, 5, 6, 7, 1];
+  const restarViernes = diasParaViernes[diaSemana] ?? 1;
+
+  const hasta = new Date(hoy);
+  hasta.setDate(hoy.getDate() - restarViernes);
+  hasta.setHours(23, 59, 59, 999);
+
+  const desde = new Date(hasta);
+  desde.setDate(hasta.getDate() - 6);
+  desde.setHours(0, 0, 0, 0);
+
+  return { desde, hasta };
+}
+
+const { desde: initDesde, hasta: initHasta } = obtenerUltimaSemanaSabadoAViernes();
+const fechaHasta = ref<Date | null>(initHasta);
+const fechaDesde = ref<Date | null>(initDesde);
+
 
 // Valores mostrados en barra superior.
 const usuarioNombre = computed(() => usuario.value?.username || 'operador');
@@ -101,8 +128,8 @@ async function irAClientes() {
   await router.push('/clientes');
 }
 
-// Carga coordinada de perfil + ventas.
-async function cargarDatos() {
+// Carga del perfil de usuario.
+async function cargarPerfil() {
   const token = obtenerToken();
 
   if (!token) {
@@ -110,7 +137,29 @@ async function cargarDatos() {
     return;
   }
 
-  // Validacion basica del rango de fechas antes de consultar.
+  try {
+    const perfil = await obtenerPerfil(token);
+    usuario.value = perfil.usuario;
+    localStorage.setItem(USER_KEY, JSON.stringify(perfil.usuario));
+  } catch (e) {
+    const mensaje = e instanceof Error ? e.message : 'No se pudo cargar el perfil';
+    error.value = mensaje;
+
+    if (/token|401|expirado|credenciales/i.test(mensaje)) {
+      await cerrarSesion();
+    }
+  }
+}
+
+// Carga del reporte de ventas para el periodo seleccionado.
+async function cargarReporte() {
+  const token = obtenerToken();
+
+  if (!token) {
+    await router.replace('/login');
+    return;
+  }
+
   if (fechaDesde.value && fechaHasta.value && fechaDesde.value.getTime() > fechaHasta.value.getTime()) {
     error.value = 'La fecha desde no puede ser mayor que la fecha hasta';
     return;
@@ -120,33 +169,38 @@ async function cargarDatos() {
   error.value = '';
 
   try {
-    const [perfil, dataVentas] = await Promise.all([
-      obtenerPerfil(token),
-      obtenerVentas(token, {
-        desde: aFechaApi(fechaDesde.value),
-        hasta: aFechaApi(fechaHasta.value),
-      }),
-    ]);
-
-    usuario.value = perfil.usuario;
+    const dataVentas = await obtenerVentas(token, {
+      desde: aFechaApi(fechaDesde.value),
+      hasta: aFechaApi(fechaHasta.value),
+    });
     ventas.value = dataVentas;
-    localStorage.setItem(USER_KEY, JSON.stringify(perfil.usuario));
     ultimaActualizacion.value = new Date().toLocaleString();
   } catch (e) {
-    const mensaje = e instanceof Error ? e.message : 'No se pudieron cargar los datos';
+    const mensaje = e instanceof Error ? e.message : 'No se pudieron cargar los datos de ventas';
     error.value = mensaje;
 
-    // Si token esta vencido/invalido, se forza cierre de sesion.
     if (/token|401|expirado|credenciales/i.test(mensaje)) {
       await cerrarSesion();
-      return;
     }
   } finally {
     cargando.value = false;
   }
 }
 
-// Hidratacion inicial: intenta levantar usuario cacheado y luego refresca desde API.
+// Carga coordinada de perfil + ventas (ej. para boton Recargar).
+async function cargarDatos() {
+  cargando.value = true;
+  error.value = '';
+  try {
+    await Promise.all([cargarPerfil(), cargarReporte()]);
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Error al cargar los datos';
+  } finally {
+    cargando.value = false;
+  }
+}
+
+// Hidratacion inicial: intenta levantar usuario cacheado y luego refresca perfil desde API.
 onMounted(() => {
   const usuarioGuardado = localStorage.getItem(USER_KEY);
 
@@ -158,7 +212,7 @@ onMounted(() => {
     }
   }
 
-  void cargarDatos();
+  void cargarPerfil();
 });
 </script>
 
@@ -191,7 +245,7 @@ onMounted(() => {
       @update:fecha-desde="fechaDesde = $event"
       @update:fecha-hasta="fechaHasta = $event"
       @update:filtro="filtro = $event"
-      @aplicar="cargarDatos"
+      @aplicar="cargarReporte"
     />
 
     <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>

@@ -2,6 +2,8 @@ require('dotenv').config();
 const app = require('./src/app');
 const { validarConexion } = require('./src/db/connection');
 
+const { iniciarCronReporte } = require('./src/services/reporte.service');
+
 const PORT = process.env.PORT || 3001;
 
 async function iniciarServidor() {
@@ -13,8 +15,10 @@ async function iniciarServidor() {
     }
 
     app.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto http://localhost:${PORT}`);
-});}
+        console.log(`Servidor escuchando en el puerto http://localhost:${PORT}`);
+        iniciarCronReporte();
+    });
+}
 
 iniciarServidor();
 

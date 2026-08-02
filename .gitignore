@@ -27,5 +27,7 @@ lerna-debug.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
-.DS_Store
+# Archivos personales de historial de cambios
+LogModificaciones.md
+LogModificaciones*
+

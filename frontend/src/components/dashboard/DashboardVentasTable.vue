@@ -4,6 +4,7 @@ import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import Tag from 'primevue/tag';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { Venta } from '../../services/api';
@@ -25,6 +26,13 @@ const props = defineProps<{
 const rowsOrdenadasPorDias = computed(() =>
   [...props.rows].sort((a, b) => Number(a.Dias || 0) - Number(b.Dias || 0)),
 );
+
+// Clase dinamica para resaltar en rojo las filas con menos de 4 dias.
+function rowClass(data: VentaPresentable) {
+  return {
+    'fila-alerta-dias': Number(data.Dias || 0) < 4,
+  };
+}
 
 // Exporta la tabla actual a PDF manteniendo el orden por Dias.
 function exportarPdf() {
@@ -63,6 +71,18 @@ function exportarPdf() {
     columnStyles: {
       6: { halign: 'right' },
     },
+    didParseCell: (data) => {
+      if (data.section === 'body') {
+        const item = rowsOrdenadasPorDias.value[data.row.index];
+        if (item && Number(item.Dias || 0) < 4) {
+          data.cell.styles.fillColor = [254, 226, 226];
+          if (data.column.index === 6) {
+            data.cell.styles.textColor = [185, 28, 28];
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
+      }
+    },
   });
 
   const stamp = new Date().toISOString().slice(0, 10);
@@ -91,6 +111,7 @@ function exportarPdf() {
       <DataTable
         :value="rowsOrdenadasPorDias"
         :loading="cargando"
+        :rowClass="rowClass"
         sortField="Dias"
         :sortOrder="1"
         paginator
@@ -112,7 +133,14 @@ function exportarPdf() {
         <Column field="Direccion" header="Direccion" />
         <Column field="Localidad" header="Localidad" sortable />
         <Column field="Provincia" header="Provincia" sortable />
-        <Column field="Dias" header="Dias" sortable />
+        <Column field="Dias" header="Dias" sortable>
+          <template #body="{ data }">
+            <Tag
+              :severity="Number(data.Dias || 0) < 4 ? 'danger' : 'secondary'"
+              :value="String(data.Dias ?? 0)"
+            />
+          </template>
+        </Column>
       </DataTable>
     </template>
   </Card>
@@ -126,5 +154,20 @@ function exportarPdf() {
   justify-content: space-between;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+/* Resaltado para filas con menos de 4 dias */
+:deep(.fila-alerta-dias) {
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+:deep(.p-datatable-striped .p-datatable-tbody > tr.fila-alerta-dias) {
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+:deep(.p-datatable-tbody > tr.fila-alerta-dias:hover) {
+  background-color: #fee2e2 !important;
 }
 </style>

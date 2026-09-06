@@ -2,27 +2,19 @@ const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 
-// Calcula la ultima semana completa de sabado a viernes.
-function obtenerUltimaSemanaSabadoAViernes() {
-    const hoy = new Date();
-    const diaSemana = hoy.getDay();
-    // Domingo (0) -> restar 2
-    // Lunes (1) -> restar 3
-    // Martes (2) -> restar 4
-    // Miercoles (3) -> restar 5
-    // Jueves (4) -> restar 6
-    // Viernes (5) -> restar 7
-    // Sabado (6) -> restar 1
-    const diasParaViernes = [2, 3, 4, 5, 6, 7, 1];
-    const restarViernes = diasParaViernes[diaSemana] ?? 1;
+// Calcula la semana de lunes a domingo.
+function obtenerSemanaLunesADomingo(referencia = new Date()) {
+    const hoy = new Date(referencia);
+    const diaSemana = hoy.getDay(); // 0: Domingo, 1: Lunes, ..., 6: Sabado
+    const diasDesdeLunes = diaSemana === 0 ? 6 : diaSemana - 1;
 
-    const hasta = new Date(hoy);
-    hasta.setDate(hoy.getDate() - restarViernes);
-    hasta.setHours(23, 59, 59, 999);
-
-    const desde = new Date(hasta);
-    desde.setDate(hasta.getDate() - 6);
+    const desde = new Date(hoy);
+    desde.setDate(hoy.getDate() - diasDesdeLunes);
     desde.setHours(0, 0, 0, 0);
+
+    const hasta = new Date(desde);
+    hasta.setDate(desde.getDate() + 6);
+    hasta.setHours(23, 59, 59, 999);
 
     return { desde, hasta };
 }
@@ -167,11 +159,14 @@ async function enviarCorreoReporte(pdfBuffer, fechaDesde, fechaHasta, destinatar
 
 // Inicializa el cron para correr todos los lunes a las 09:00 hs.
 function iniciarCronReporte() {
-    // Minuto 0, Hora 9, Cualquier dia del mes, Cualquier mes, Sabado (6), Domingo (0) y Lunes (1)
-    cron.schedule('0 9 * * 0,1,6', async () => {
+    // Minuto 0, Hora 9, Lunes (1)
+    cron.schedule('0 9 * * 1', async () => {
         console.log('Cron: Iniciando envio automatico del reporte semanal...');
         try {
-            const { desde, hasta } = obtenerUltimaSemanaSabadoAViernes();
+            // Se toma la semana recien concluida de lunes a domingo.
+            const ayer = new Date();
+            ayer.setDate(ayer.getDate() - 1);
+            const { desde, hasta } = obtenerSemanaLunesADomingo(ayer);
             const { obtenerVtas } = require('./vtas.service');
             const vtas = await obtenerVtas({ desde, hasta });
             
@@ -187,11 +182,12 @@ function iniciarCronReporte() {
             console.error('Cron: Error al enviar el reporte semanal programado:', error);
         }
     });
-    console.log('Cron: Tarea programada del reporte semanal registrada (Sabados, Domingos y Lunes a las 09:00 hs)');
+    console.log('Cron: Tarea programada del reporte semanal registrada (Lunes a las 09:00 hs)');
 }
 
 module.exports = {
-    obtenerUltimaSemanaSabadoAViernes,
+    obtenerSemanaLunesADomingo,
+    obtenerUltimaSemanaSabadoAViernes: obtenerSemanaLunesADomingo,
     generarPDFReporte,
     enviarCorreoReporte,
     iniciarCronReporte,

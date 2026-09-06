@@ -62,6 +62,7 @@ const localeEs = {
             :modelValue="fechaDesde"
             dateFormat="yy-mm-dd"
             :locale="localeEs"
+            :firstDayOfWeek="1"
             showIcon
             @update:modelValue="emit('update:fechaDesde', ($event as Date | null) ?? null)"
           />
@@ -74,6 +75,7 @@ const localeEs = {
             :modelValue="fechaHasta"
             dateFormat="yy-mm-dd"
             :locale="localeEs"
+            :firstDayOfWeek="1"
             showIcon
             @update:modelValue="emit('update:fechaHasta', ($event as Date | null) ?? null)"
           />

@@ -1,5 +1,5 @@
 const { 
-    obtenerUltimaSemanaSabadoAViernes, 
+    obtenerSemanaLunesADomingo, 
     generarPDFReporte, 
     enviarCorreoReporte 
 } = require('../services/reporte.service');
@@ -7,7 +7,7 @@ const { obtenerVtas } = require('../services/vtas.service');
 
 async function enviarReportePruebaController(req, res) {
     try {
-        const { desde, hasta } = obtenerUltimaSemanaSabadoAViernes();
+        const { desde, hasta } = obtenerSemanaLunesADomingo();
         
         // Obtener ventas para el rango
         const vtas = await obtenerVtas({ desde, hasta });

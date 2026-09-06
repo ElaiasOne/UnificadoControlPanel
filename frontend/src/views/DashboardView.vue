@@ -18,32 +18,24 @@ const usuario = ref<Usuario | null>(null);
 const ventas = ref<Venta[]>([]);
 const filtro = ref('');
 const ultimaActualizacion = ref('-');
-// Calcula la ultima semana completa de sabado a viernes.
-function obtenerUltimaSemanaSabadoAViernes() {
-  const hoy = new Date();
-  const diaSemana = hoy.getDay();
-  // Domingo (0) -> restar 2
-  // Lunes (1) -> restar 3
-  // Martes (2) -> restar 4
-  // Miercoles (3) -> restar 5
-  // Jueves (4) -> restar 6
-  // Viernes (5) -> restar 7
-  // Sabado (6) -> restar 1
-  const diasParaViernes = [2, 3, 4, 5, 6, 7, 1];
-  const restarViernes = diasParaViernes[diaSemana] ?? 1;
+// Calcula la semana actual de lunes a domingo.
+function obtenerSemanaLunesADomingo(fechaReferencia: Date = new Date()) {
+  const hoy = new Date(fechaReferencia);
+  const diaSemana = hoy.getDay(); // 0: Domingo, 1: Lunes, ..., 6: Sabado
+  const diasDesdeLunes = diaSemana === 0 ? 6 : diaSemana - 1;
 
-  const hasta = new Date(hoy);
-  hasta.setDate(hoy.getDate() - restarViernes);
-  hasta.setHours(23, 59, 59, 999);
-
-  const desde = new Date(hasta);
-  desde.setDate(hasta.getDate() - 6);
+  const desde = new Date(hoy);
+  desde.setDate(hoy.getDate() - diasDesdeLunes);
   desde.setHours(0, 0, 0, 0);
+
+  const hasta = new Date(desde);
+  hasta.setDate(desde.getDate() + 6);
+  hasta.setHours(23, 59, 59, 999);
 
   return { desde, hasta };
 }
 
-const { desde: initDesde, hasta: initHasta } = obtenerUltimaSemanaSabadoAViernes();
+const { desde: initDesde, hasta: initHasta } = obtenerSemanaLunesADomingo();
 const fechaHasta = ref<Date | null>(initHasta);
 const fechaDesde = ref<Date | null>(initDesde);
 
